@@ -24,5 +24,10 @@ namespace G
         {
             InitializeComponent();
         }
+
+        private void mainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
     }
 }

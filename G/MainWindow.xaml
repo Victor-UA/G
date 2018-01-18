@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:G"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Name="mainWindow"
+        Title="MainWindow" Height="350" Width="525" KeyDown="mainWindow_KeyDown">
     <Grid>
-        
+        <Canvas Name="c_Main">
+            <Rectangle Name="r_Default" Canvas.Left="10" Canvas.Top="10" Height="10" Width="10" RadiusX="3" RadiusY="3" Fill="YellowGreen" Opacity="10"/>
+        </Canvas>
     </Grid>
 </Window>

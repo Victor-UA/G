@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace G
+namespace G.Base
 {
-    class Player: Entity
-    { 
+    public abstract class Environment : IEnvironment
+    {
+        public double Density { get; protected set; }
     }
 }

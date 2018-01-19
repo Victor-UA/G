@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:G.Test"
         Name="mainWindow"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         Title="MainWindow" Height="400" Width="600" Closing="mainWindow_Closing">
     <Grid KeyDown="Grid_KeyDown" KeyUp="Grid_KeyUp">
         <Grid.RowDefinitions>

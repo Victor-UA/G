@@ -13,7 +13,6 @@ namespace G.Base
         public double YClockWise = 0;
         public double YCounterClockWise = 0;
         public double ZClockWise = 0;
-        public double ZCounterClockWise = 0;
-        public double EnvironmentResistance = 0;
+        public double ZCounterClockWise = 0;        
     }
 }

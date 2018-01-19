@@ -12,6 +12,5 @@ namespace G.Base
         public double Backward = 0;
         public double StrafeLeft = 0;
         public double StrafeRight = 0;
-        public double EnvironmentResistance = 0;
     }
 }

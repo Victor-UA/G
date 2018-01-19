@@ -41,16 +41,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AngularPowers.cs" />
-    <Compile Include="Entity.cs" />
-    <Compile Include="IEntity.cs" />
-    <Compile Include="IMovable.cs" />
-    <Compile Include="IStrikable.cs" />
-    <Compile Include="LinearPowers.cs" />
-    <Compile Include="MoveStates.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="Position.cs" />
-    <Compile Include="Powers.cs" />
+    <Compile Include="Environments\Air.cs" />
+    <Compile Include="Entities\Properties\AngularPowers.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Environments\Environment.cs" />
+    <Compile Include="Entities\IEntity.cs" />
+    <Compile Include="Environments\IEnvironment.cs" />
+    <Compile Include="Entities\Behaviour\IMovable.cs" />
+    <Compile Include="Entities\Behaviour\IStrikable.cs" />
+    <Compile Include="Entities\Properties\LinearPowers.cs" />
+    <Compile Include="Entities\Properties\MoveStates.cs" />
+    <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\Properties\Position.cs" />
+    <Compile Include="Entities\Properties\Powers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +62,7 @@
       <Name>RP.Math.Vector3</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

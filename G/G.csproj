@@ -87,7 +87,6 @@
   <ItemGroup>
     <Compile Include="MainWindowModel.cs" />
     <Compile Include="MainWindowVM.cs" />
-    <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -116,6 +115,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\G.Base\G.Base.csproj">
+      <Project>{71BDC704-BC72-46D2-A8A6-95161D85BA0C}</Project>
+      <Name>G.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\G.Logic\G.Logic.csproj">
       <Project>{69e8e0f3-7302-4016-abf1-458a7be250a1}</Project>
       <Name>G.Logic</Name>

@@ -20,7 +20,7 @@ namespace G.Logic
 
         public Player AddPlayer()
         {
-            Player player = new Player();
+            Player player = new Player(75);
             lock (_lock)
             {
                 _entities.Add(player.ID, player);            
@@ -73,28 +73,43 @@ namespace G.Logic
                         }
                         if (mState.StrafeLeft)
                         {
-                            Force -= item.Position.Direction.RotateZ(Math.PI/2) * movableItem.Power.Linear.StrafeLeft;
+                            Force -= item.Position.Direction.RotateZ(Math.PI / 2) * movableItem.Power.Linear.StrafeLeft;
                         }
                         if (mState.StrafeRight)
                         {
-                            Force += item.Position.Direction.RotateZ(Math.PI/2) * movableItem.Power.Linear.StrafeRight;
+                            Force += item.Position.Direction.RotateZ(Math.PI / 2) * movableItem.Power.Linear.StrafeRight;
                         }
 
-                        if (Force.Magnitude != 0)
+                        double t = timeElapsed.TotalSeconds;
+                        double t2 = Math.Pow(t, 2);
+
+                        Vector3 EnvironmentResistance =
+                            movableItem.AerodynamicResistanceCoefficientS *
+                            movableItem.Environment.Density *
+                            movableItem.Velocity * movableItem.Velocity.Magnitude / 2;
+
+                        if (movableItem.Velocity <= Vector3.Epsilon)
                         {
-                            Vector3 ForceProjectedOnVelocity = Force.Projection(movableItem.Velocity);
-                            Vector3 ForceRejectedOnVelocity = Force - ForceProjectedOnVelocity;
-                            Vector3 Velocity1ProjectedOnVelocity = movableItem.Velocity + ForceProjectedOnVelocity / (item.Mass * timeElapsed.TotalSeconds);
-                            Vector3 Velocity1RejectedOnVelocity = ForceRejectedOnVelocity / (item.Mass * timeElapsed.TotalSeconds);
-                            //Визначити кінцеву позицію з урахуванням постійної дії сили
-                            //V = V0 + F/(m*t)
-                            //movableItem.Velocity
-                            //item.Position.Location += delta * timeElapsed.TotalSeconds * movableItem.Velocity;
+                            Vector3 a = (Force - EnvironmentResistance) / item.Mass;
+                            item.Position.Location += a * t2 / 2;
+                            movableItem.Velocity += a * t;
                         }
                         else
                         {
-                            movableItem.Velocity = item.Position.Direction * 0;
-                        }                        
+                            //X: Projected On Velocity
+                            //Y: RejectedOnVelocity                   
+                            Vector3 ForceX = Force.Projection(movableItem.Velocity);
+                            Vector3 ForceY = Force - ForceX;
+
+                            Vector3 ax = (ForceX - EnvironmentResistance) / item.Mass;
+                            Vector3 ay = ForceY / item.Mass;
+
+                            Vector3 dX = movableItem.Velocity + ax * t2 / 2;
+                            Vector3 dY = ay * t2 / 2;
+
+                            item.Position.Location += (dX + dY);
+                            movableItem.Velocity += (ax + ay) * t;
+                        }
                     }
                 }
             }

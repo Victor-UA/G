@@ -1,4 +1,5 @@
-﻿using System;
+﻿using G.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,14 +11,14 @@ namespace G
     {
         public MainWindowModel()
         {
-            Entities = new HashSet<Entity>();
+            Entities = new HashSet<IEntity>();
         }
-        public ICollection<Entity> Entities { get; }
+        public ICollection<IEntity> Entities { get; }
         private Player _player;
 
         public void NewPlayer()
         {
-            _player = new Player();            
+            _player = new Player(75);            
         }
     }
 }

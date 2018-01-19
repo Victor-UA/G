@@ -35,7 +35,7 @@ namespace G.Test
                 isRun = true;
 
                 StartService();
-                ConnectNewPlayers(1);
+                //ConnectNewPlayers(1);
                 MoveAIPlayers();
 
                 _entitiesModels = new Dictionary<int, IEntityModel>();
@@ -169,7 +169,7 @@ namespace G.Test
                             }
                             else
                             {
-                                throw(new NullReferenceException());
+                                throw(new NotSupportedException());
                             }
                         }
 

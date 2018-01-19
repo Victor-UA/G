@@ -12,5 +12,7 @@ namespace G.Base
         MoveStates MoveState { get; }
         Vector3 Velocity { get; set; }
         Powers Power { get; set; }
+        IEnvironment Environment { get; set; }
+        double AerodynamicResistanceCoefficientS { get; set; }
     }
 }

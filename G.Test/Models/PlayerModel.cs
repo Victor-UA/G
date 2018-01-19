@@ -49,7 +49,7 @@ namespace G.Test.Models
                     }
                     if (currentCanvas.Children.Contains(_direction))
                     {
-                        currentCanvas.Children.Remove(_direction);                    
+                        currentCanvas.Children.Remove(_direction);
                     }
                 }
                 catch (Exception)
@@ -57,11 +57,12 @@ namespace G.Test.Models
                 }
             }
             Canvas.SetLeft(_body, Data.Position.Location.X - 5);
-            Canvas.SetTop(_body, Data.Position.Location.Y - 5);            
+            Canvas.SetTop(_body, Data.Position.Location.Y - 5);
             _direction.X1 = Data.Position.Location.X;
             _direction.Y1 = Data.Position.Location.Y;
             _direction.X2 = Data.Position.Location.X + Data.Position.Direction.X * 20;
             _direction.Y2 = Data.Position.Location.Y + Data.Position.Direction.Y * 20;
+        
             if (!canvas.Children.Contains(_body))
             {
                 canvas.Children.Add(_body);

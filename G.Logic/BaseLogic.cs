@@ -52,40 +52,49 @@ namespace G.Logic
                     {
                         IMovable movableItem = item as IMovable;
                         MoveStates mState = movableItem.MoveState;
+
                         if (mState.RotateLeft)
                         {
-                            item.Position.Direction = item.Position.Direction.RotateZ(-4 * timeElapsed.TotalSeconds);
+                            item.Position.Direction = item.Position.Direction.RotateZ(-movableItem.Power.Angular.ZCounterClockWise * timeElapsed.TotalSeconds);
                         }
                         if (mState.RotateRight)
                         {
-                            item.Position.Direction = item.Position.Direction.RotateZ(4 * timeElapsed.TotalSeconds);
+                            item.Position.Direction = item.Position.Direction.RotateZ(movableItem.Power.Angular.ZClockWise * timeElapsed.TotalSeconds);
                         }
-                        Vector3 delta = new Vector3();
+
+                        Vector3 Force = new Vector3();
                         if (mState.Forward)
                         {
-                            delta += item.Position.Direction;
+                            Force += item.Position.Direction * movableItem.Power.Linear.Forward;
                         }
                         if (mState.Backward)
                         {
-                            delta -= item.Position.Direction;
+                            Force -= item.Position.Direction * movableItem.Power.Linear.Backward;
                         }
                         if (mState.StrafeLeft)
                         {
-                            delta -= item.Position.Direction.RotateZ(Math.PI/2);
+                            Force -= item.Position.Direction.RotateZ(Math.PI/2) * movableItem.Power.Linear.StrafeLeft;
                         }
                         if (mState.StrafeRight)
                         {
-                            delta += item.Position.Direction.RotateZ(Math.PI/2);
+                            Force += item.Position.Direction.RotateZ(Math.PI/2) * movableItem.Power.Linear.StrafeRight;
                         }
-                        if (delta.Magnitude != 0)
+
+                        if (Force.Magnitude != 0)
                         {
-                            movableItem.Velocity = 50;
-                            item.Position.Location += delta * timeElapsed.TotalSeconds * movableItem.Velocity;
+                            Vector3 ForceProjectedOnVelocity = Force.Projection(movableItem.Velocity);
+                            Vector3 ForceRejectedOnVelocity = Force - ForceProjectedOnVelocity;
+                            Vector3 Velocity1ProjectedOnVelocity = movableItem.Velocity + ForceProjectedOnVelocity / (item.Mass * timeElapsed.TotalSeconds);
+                            Vector3 Velocity1RejectedOnVelocity = ForceRejectedOnVelocity / (item.Mass * timeElapsed.TotalSeconds);
+                            //Визначити кінцеву позицію з урахуванням постійної дії сили
+                            //V = V0 + F/(m*t)
+                            //movableItem.Velocity
+                            //item.Position.Location += delta * timeElapsed.TotalSeconds * movableItem.Velocity;
                         }
                         else
                         {
-                            movableItem.Velocity = 0;
-                        }
+                            movableItem.Velocity = item.Position.Direction * 0;
+                        }                        
                     }
                 }
             }

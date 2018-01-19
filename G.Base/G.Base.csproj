@@ -41,12 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AngularPowers.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="IEntity.cs" />
     <Compile Include="IMovable.cs" />
     <Compile Include="IStrikable.cs" />
+    <Compile Include="LinearPowers.cs" />
     <Compile Include="MoveStates.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Position.cs" />
+    <Compile Include="Powers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

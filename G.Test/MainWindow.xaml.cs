@@ -216,7 +216,6 @@ namespace G.Test
                 }
                 e.Handled = true;
                 MainService.Instance.SetPlayerStates(_player);
-                Console.WriteLine(e.Key);
             }
         }
 
@@ -240,7 +239,6 @@ namespace G.Test
                         break;
                 }
                 MainService.Instance.SetPlayerStates(_player);
-                Console.WriteLine(e.Key);
             }
         }
 

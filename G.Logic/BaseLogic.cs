@@ -63,14 +63,33 @@ namespace G.Logic
                         }
 
                         Vector3 Force = new Vector3();
-                        if (mState.Forward)
+                        Vector3 BreaksFrictionResistanse =
+                                  movableItem.Velocity *
+                                  movableItem.FrictionResistanceCoefficientS *
+                                  item.Mass * 9.8;
+                        //double alpha = item.Position.Direction.Angle(movableItem.Velocity);
+                        //bool isForward = alpha < 90 || alpha > 270;
+
+                        if (mState.Forward || mState.Backward)
                         {
-                            Force += item.Position.Direction * movableItem.Power.Linear.Forward;
+                            if (mState.Forward)
+                            {
+                                Force += item.Position.Direction * movableItem.Power.Linear.Forward;
+                            }
+                            if (mState.Backward)
+                            {
+                                Force -= item.Position.Direction * movableItem.Power.Linear.Backward;
+                            }
                         }
-                        if (mState.Backward)
+                        else
                         {
-                            Force -= item.Position.Direction * movableItem.Power.Linear.Backward;
-                        }
+                            if (movableItem.BreakesAreOnWithoutMoving)
+                            {
+                                Force -= BreaksFrictionResistanse;
+                            }
+                        }                        
+                        
+                                                
                         if (mState.StrafeLeft)
                         {
                             Force -= item.Position.Direction.RotateZ(Math.PI / 2) * movableItem.Power.Linear.StrafeLeft;
@@ -83,7 +102,7 @@ namespace G.Logic
                         double t = timeElapsed.TotalSeconds;
                         double t2 = Math.Pow(t, 2);
 
-                        Vector3 EnvironmentResistance =
+                        Vector3 EnvironmentResistance =                            
                             movableItem.AerodynamicResistanceCoefficientS *
                             movableItem.Environment.Density *
                             movableItem.Velocity * movableItem.Velocity.Magnitude / 2;
@@ -96,19 +115,34 @@ namespace G.Logic
                         }
                         else
                         {
+                            Vector3 SideFrictionResistanse = movableItem.Velocity.Rejection(item.Position.Direction);
+                            SideFrictionResistanse =
+                                SideFrictionResistanse *
+                                movableItem.FrictionResistanceCoefficientS *
+                                item.Mass * 9.8;
+
                             //X: Projected On Velocity
                             //Y: RejectedOnVelocity                   
-                            Vector3 ForceX = Force.Projection(movableItem.Velocity);
-                            Vector3 ForceY = Force - ForceX;
+                            Vector3 SideFrictionResistanseX = SideFrictionResistanse.Projection(movableItem.Velocity);                            
+                            Vector3 SideFrictionResistanseY = SideFrictionResistanse - SideFrictionResistanseX;                            
 
-                            Vector3 ax = (ForceX - EnvironmentResistance) / item.Mass;
+                            Vector3 ForceX = Force.Projection(movableItem.Velocity);
+                            Vector3 ForceY = Force - ForceX - SideFrictionResistanseY;
+                            ForceX = ForceX - EnvironmentResistance - SideFrictionResistanseX;
+
+
+                            Vector3 ax = ForceX / item.Mass;
                             Vector3 ay = ForceY / item.Mass;
+                            movableItem.Velocity += (ax + ay) * t;
+
+                            if (movableItem.Velocity.IsNaN())
+                            {
+                                movableItem.Velocity = Vector3.Zero;
+                            }
 
                             Vector3 dX = movableItem.Velocity + ax * t2 / 2;
-                            Vector3 dY = ay * t2 / 2;
-
+                            Vector3 dY = ay * t2 / 2;                            
                             item.Position.Location += (dX + dY);
-                            movableItem.Velocity += (ax + ay) * t;
                         }
                     }
                 }

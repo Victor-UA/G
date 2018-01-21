@@ -6,6 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace G.Service
 {
@@ -68,15 +69,18 @@ namespace G.Service
             }
             DateTime Now = DateTime.Now;
             DateTime OldTime = Now;
-            while (IsRun)
+            Task.Factory.StartNew(() =>
             {
-                TimeSpan timeElapsed = Now - OldTime;
-                Logic.DoMoves(timeElapsed);
-                Logic.CheckStrikes();
-                Thread.Sleep(1);
-                OldTime = Now;
-                Now = DateTime.Now;
-            }
+                while (IsRun)
+                {
+                    TimeSpan timeElapsed = Now - OldTime;
+                    Logic.DoMoves(timeElapsed);
+                    Logic.CheckStrikes();
+                    Thread.Sleep(1);
+                    OldTime = Now;
+                    Now = DateTime.Now;
+                }
+            });            
         }
 
 

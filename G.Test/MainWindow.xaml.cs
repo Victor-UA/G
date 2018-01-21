@@ -34,19 +34,18 @@ namespace G.Test
             {
                 isRun = true;
 
-                StartService();
-                //ConnectNewPlayers(1);
-                MoveAIPlayers();
+                StartService();                
 
                 _entitiesModels = new Dictionary<int, IEntityModel>();
 
-                Task.Factory.StartNew(() =>
-                {
-                    Random rnd = new Random();
-                    _player = MainService.Instance.AddPlayer();
-                    _player.Position.Location = new Vector3(rnd.Next(500), rnd.Next(500), 0);
-                    DrawGamePlay();
-                });
+                Random rnd = new Random();
+                _player = MainService.Instance.AddPlayer();
+                _player.Position.Location = new Vector3(10 + rnd.Next((int)mainWindow.ActualWidth/2 - 10), 10 + rnd.Next((int)mainWindow.ActualHeight/2 - 10), 0);
+
+                DrawGamePlay();                
+
+                ConnectNewPlayers(1);
+                MoveAIPlayers();
             }
             else
             {
@@ -67,7 +66,7 @@ namespace G.Test
                 for (int i = 0; i < count; i++)
                 {
                     Player player = MainService.Instance.AddPlayer();
-                    player.Position.Location = new Vector3(rnd.Next((int)mainWindow.ActualWidth), rnd.Next((int)mainWindow.ActualHeight), 0);
+                    player.Position.Location = new Vector3(rnd.Next((int)mainWindow.ActualWidth/2), rnd.Next((int)mainWindow.ActualHeight/2), 0);
                     player.Position.Direction = new Vector3((int)mainWindow.ActualWidth - rnd.Next((int)mainWindow.ActualWidth), rnd.Next((int)mainWindow.ActualHeight), 0);
                     player.MoveState.Forward = true;
                     player.MoveState.RotateLeft = rnd.NextDouble() > 0.5;
@@ -116,13 +115,10 @@ namespace G.Test
 
         private void StartService()
         {
-            Task.Factory.StartNew(() =>
+            if (!MainService.Instance.IsRun)
             {
-                if (!MainService.Instance.IsRun)
-                {
-                    MainService.Instance.ManualStart(null);
-                }
-            });
+                MainService.Instance.ManualStart(null);
+            }
         }
 
         private void DrawGamePlay()
@@ -146,53 +142,57 @@ namespace G.Test
 
             int SleepTime = 10;
             var IterationTime = new Stopwatch();
-            while (isRun)
+
+            Task.Factory.StartNew(() =>
             {
-                IterationTime.Restart();
-                Dispatcher.Invoke(() =>
+                while (isRun)
                 {
-                    IDictionary<int, Entity> Entities = MainService.Instance.GetEntities();
-                    foreach (var item in Entities.Values)
+                    IterationTime.Restart();
+                    Dispatcher.Invoke(() =>
                     {
-                        IEntityModel model;
-                        if (_entitiesModels.ContainsKey(item.ID))
+                        IDictionary<int, Entity> Entities = MainService.Instance.GetEntities();
+                        foreach (var item in Entities.Values)
                         {
-                            model = _entitiesModels[item.ID];
-                            model.Data = item;
-                        }
-                        else
-                        {
-                            if (item is Player)
+                            IEntityModel model;
+                            if (_entitiesModels.ContainsKey(item.ID))
                             {
-                                model = new PlayerModel(item as Player);
-                                _entitiesModels.Add(item.ID, model);
+                                model = _entitiesModels[item.ID];
+                                model.Data = item;
                             }
                             else
                             {
-                                throw(new NotSupportedException());
+                                if (item is Player)
+                                {
+                                    model = new PlayerModel(item as Player);
+                                    _entitiesModels.Add(item.ID, model);
+                                }
+                                else
+                                {
+                                    throw (new NotSupportedException());
+                                }
+                            }
+
+                            model.Draw(c_Main1);
+                            if (!isRun)
+                            {
+                                return;
                             }
                         }
 
-                        model.Draw(c_Main1);
-                        if (!isRun)
+                        var entityModelsToDispose = _entitiesModels.Values.Where(item => !Entities.ContainsKey(item.Data.ID)).ToArray();
+                        foreach (var entityModel in entityModelsToDispose)
                         {
-                            return;
+                            entityModel.Dispose();
+                            _entitiesModels.Remove(entityModel.Data.ID);
                         }
-                    }
-
-                    var entityModelsToDispose = _entitiesModels.Values.Where(item => !Entities.ContainsKey(item.Data.ID)).ToArray();
-                    foreach (var entityModel in entityModelsToDispose)
-                    {
-                        entityModel.Dispose();
-                        _entitiesModels.Remove(entityModel.Data.ID);
-                    }
-                });
-                framesCount++;
-                IterationTime.Stop();                
-                SleepTime += (int)((IterationTime.ElapsedMilliseconds * 10) - SleepTime)/3;
-                SleepTime = SleepTime < 10 ? 10 : SleepTime > 25 ? 25 : SleepTime;
-                Thread.Sleep(SleepTime);
-            }
+                    });
+                    framesCount++;
+                    IterationTime.Stop();
+                    SleepTime += (int)((IterationTime.ElapsedMilliseconds * 10) - SleepTime) / 3;
+                    SleepTime = SleepTime < 10 ? 10 : SleepTime > 25 ? 25 : SleepTime;
+                    Thread.Sleep(SleepTime);
+                }
+            });
         }
 
         private void Grid_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

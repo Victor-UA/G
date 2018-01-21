@@ -14,5 +14,7 @@ namespace G.Base
         Powers Power { get; set; }
         IEnvironment Environment { get; set; }
         double AerodynamicResistanceCoefficientS { get; set; }
+        double FrictionResistanceCoefficientS { get; set; }
+        bool BreakesAreOnWithoutMoving { get; set; }
     }
 }

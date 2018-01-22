@@ -17,16 +17,14 @@ namespace G.Test.Models
             Data = data;
             _body = new Rectangle()
             {
-                Height = 10,
-                Width = 10,
-                Fill = new SolidColorBrush(Colors.Aqua)
+                Height = 15,
+                Width = 15,
+                Fill = new SolidColorBrush(Colors.Cyan),
+                RadiusX = 2,
+                RadiusY = 2
             };
             _direction = new Line()
-            {
-                X1 = Data.Position.Location.X,
-                Y1 = Data.Position.Location.Y,
-                X2 = Data.Position.Location.X + Data.Position.Direction.X * 20,
-                Y2 = Data.Position.Location.Y + Data.Position.Direction.Y * 20,
+            {                
                 Stroke = Brushes.Black,
                 StrokeThickness = 3
             };
@@ -56,8 +54,8 @@ namespace G.Test.Models
                 {
                 }
             }
-            Canvas.SetLeft(_body, Data.Position.Location.X - 5);
-            Canvas.SetTop(_body, Data.Position.Location.Y - 5);
+            Canvas.SetLeft(_body, Data.Position.Location.X - _body.Width/2);
+            Canvas.SetTop(_body, Data.Position.Location.Y - _body.Height/2);
             _direction.X1 = Data.Position.Location.X;
             _direction.Y1 = Data.Position.Location.Y;
             _direction.X2 = Data.Position.Location.X + Data.Position.Direction.X * 20;

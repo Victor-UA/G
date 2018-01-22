@@ -41,11 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\MovableEntity.cs" />
     <Compile Include="Environments\Air.cs" />
     <Compile Include="Entities\Properties\AngularPowers.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Environments\Environment.cs" />
     <Compile Include="Entities\IEntity.cs" />
+    <Compile Include="Environments\Glass.cs" />
     <Compile Include="Environments\IEnvironment.cs" />
     <Compile Include="Entities\Behaviour\IMovable.cs" />
     <Compile Include="Entities\Behaviour\IStrikable.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Entities\Properties\Position.cs" />
     <Compile Include="Entities\Properties\Powers.cs" />
+    <Compile Include="Environments\ISurface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,12 +9,15 @@ namespace G.Base
 {
     public interface IMovable
     {
-        MoveStates MoveState { get; }
-        Vector3 Velocity { get; set; }
+        MoveStates MoveState { get; set; }
+        Vector3 Velocity { get; }
         Powers Power { get; set; }
         IEnvironment Environment { get; set; }
-        double AerodynamicResistanceCoefficientS { get; set; }
-        double FrictionResistanceCoefficientS { get; set; }
+        double AerodynamicResistanceCoefficientS { get; }
+        ISurface Surface { get; set; }
+        double FrictionCoefficientS { get; }
         bool BreakesAreOnWithoutMoving { get; set; }
+
+        void DoMoves();
     }
 }

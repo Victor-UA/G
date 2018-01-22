@@ -32,7 +32,7 @@ namespace G.Service
 
         private MainService()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
         private BaseLogic Logic
         {
@@ -48,7 +48,7 @@ namespace G.Service
                 return _logic;
             }            
         }
-        private BaseLogic _logic;
+        private BaseLogic _logic = null;
 
         private string[] _args;
         public bool IsRun { get; private set; }
@@ -66,6 +66,7 @@ namespace G.Service
                 IsPaused = false;
                 _args = args;
                 _commandIsManual = false;
+                _logic = new BaseLogic();
             }
             DateTime Now = DateTime.Now;
             DateTime OldTime = Now;

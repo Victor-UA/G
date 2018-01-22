@@ -44,7 +44,7 @@ namespace G.Test
 
                 DrawGamePlay();                
 
-                ConnectNewPlayers(1);
+                //ConnectNewPlayers(1);
                 MoveAIPlayers();
             }
             else
@@ -66,7 +66,7 @@ namespace G.Test
                 for (int i = 0; i < count; i++)
                 {
                     Player player = MainService.Instance.AddPlayer();
-                    player.Position.Location = new Vector3(rnd.Next((int)mainWindow.ActualWidth/2), rnd.Next((int)mainWindow.ActualHeight/2), 0);
+                    player.Position.Location = new Vector3(rnd.Next((int)mainWindow.ActualWidth), rnd.Next((int)mainWindow.ActualHeight), 0);
                     player.Position.Direction = new Vector3((int)mainWindow.ActualWidth - rnd.Next((int)mainWindow.ActualWidth), rnd.Next((int)mainWindow.ActualHeight), 0);
                     player.MoveState.Forward = true;
                     player.MoveState.RotateLeft = rnd.NextDouble() > 0.5;
@@ -103,12 +103,14 @@ namespace G.Test
                         if (entity is Player && entity.ID != _player?.ID)
                         {
                             var player = entity as Player;
-                            player.MoveState.RotateLeft = rnd.NextDouble() > 0.5;
-                            player.MoveState.RotateRight = !player.MoveState.RotateLeft;
+                            player.MoveState.Forward = rnd.NextDouble() > 0.3;
+                            double tmp = rnd.NextDouble();
+                            player.MoveState.RotateLeft = tmp > 0.6;
+                            player.MoveState.RotateRight = tmp < 0.4;
                             MainService.Instance.SetPlayerStates(player);
                         }
                     }
-                    Thread.Sleep(100);
+                    Thread.Sleep(250);
                 }
             });
         }
@@ -131,12 +133,26 @@ namespace G.Test
                     framesCount = 0;
                     var fpsWatch = new Stopwatch();
                     fpsWatch.Start();
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
+
                     Dispatcher.Invoke(() =>
                     {
-                        tb_FPS.Text = (framesCount / fpsWatch.Elapsed.TotalSeconds).ToString("0") + " fps";
-                        tb_PlayersCount.Text = MainService.Instance.GetEntities().Count.ToString() + " players";
-                    });                    
+                        try
+                        {
+                            tb_FPS.Text = (framesCount / fpsWatch.Elapsed.TotalSeconds).ToString("0") + " fps";
+                            tb_PlayersCount.Text = MainService.Instance.GetEntities().Count.ToString() + " players";
+                            tb_PlayerX.Text = _player.Position.Location.X.ToString("0");
+                            tb_PlayerY.Text = _player.Position.Location.Y.ToString("0");
+
+                            tb_PlayerVelocityAbs.Text = (_player.Velocity.Magnitude).ToString("0");
+                            tb_PlayerAngle.Text = _player.Position.Direction.Angle(_player.Velocity).ToString("0.00");
+
+                            tb_PlayerLocation.Text = _player.Position.Location.ToVerbString();
+                            tb_PlayerVelocity.Text = _player.Velocity.ToVerbString();
+                            tb_PlayerDirection.Text = _player.Position.Direction.ToVerbString();
+                        }
+                        catch (Exception) { }
+                    });
                 }
             });
 
@@ -185,7 +201,7 @@ namespace G.Test
                             entityModel.Dispose();
                             _entitiesModels.Remove(entityModel.Data.ID);
                         }
-                    });
+                    });                    
                     framesCount++;
                     IterationTime.Stop();
                     SleepTime += (int)((IterationTime.ElapsedMilliseconds * 10) - SleepTime) / 3;

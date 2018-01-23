@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using RP.Math;
 
@@ -15,6 +17,8 @@ namespace G.Base
             Velocity = new Vector3();
             Power = new Powers();
             LastMoveTime = DateTime.Now;
+            IsRun = false;
+            IsPaused = false;            
         }
 
         public virtual MoveStates MoveState { get; set; }
@@ -26,8 +30,46 @@ namespace G.Base
         public virtual double FrictionCoefficientS { get; protected set; }
         public virtual bool BreakesAreOnWithoutMoving { get; set; }
         protected virtual DateTime LastMoveTime { get; set; }
+        public bool IsRun { get; protected set; }
+        public bool IsPaused { get; protected set; }
+        protected CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public virtual void DoMoves()
+        protected virtual async void DoMovesAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await Task.Factory.StartNew((() =>
+                {
+                    LastMoveTime = DateTime.Now;
+                    Stopwatch sw = new Stopwatch();
+                    while (IsRun)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        sw.Restart();
+                        if (!IsPaused)
+                        {
+                            Move();
+                        }
+                        cancellationToken.ThrowIfCancellationRequested();
+                        Thread.Sleep(10);
+                        sw.Stop();
+                        double elapsedTime = sw.ElapsedMilliseconds;
+                        lock (Lock)
+                        {
+                            if (elapsedTime > MaxIterrationTime)
+                            {
+                                MaxIterrationTime = elapsedTime;
+                            }
+                        }
+                    }
+                }), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }
+            catch (TaskCanceledException ex) { }
+            catch (OperationCanceledException) { }
+            catch (Exception) { }
+        }
+
+        protected virtual void Move()
         {
             DateTime Now = DateTime.Now;
             double time = (Now - LastMoveTime).TotalSeconds;
@@ -85,48 +127,42 @@ namespace G.Base
             #endregion
 
 
-            //X: Projected On Velocity
-            //Y: RejectedOnVelocity                   
-
             if (Velocity.IsNaN() || Velocity.Magnitude < 0.5 || double.IsInfinity(Velocity.Magnitude))
             {
                 Velocity = Vector3.Zero;
-            }            
+            }
 
             Vector3 EnvironmentResistance =
                 AerodynamicResistanceCoefficientS *
                 Environment.Density *
                 -Velocity * Velocity.Magnitude / 2;
 
-            Vector3 BrakeFriction =
-                Velocity.Magnitude > 0 ?
-                      -Velocity.Normalize() *
-                      FrictionCoefficientS * Surface.FrictionCoefficient *
-                      Mass * 9.8
-                      : Vector3.Zero;
-
-            Vector3 VelocityRejectedOnDirection = Velocity.Rejection(Position.Direction);            
-            Vector3 SideFriction =
-                VelocityRejectedOnDirection.Magnitude > 0 ?
-                    -VelocityRejectedOnDirection.Normalize() *
-                    FrictionCoefficientS * Surface.FrictionCoefficient *
-                    Mass * 9.8
-                    : Vector3.Zero;
-
             if (!brakesOn)
             {
+                Vector3 VelocityRejectedOnDirection = Velocity.Rejection(Position.Direction);
+                Vector3 SideFriction =
+                    VelocityRejectedOnDirection.Magnitude > 0 ?
+                        -VelocityRejectedOnDirection.Normalize() *
+                        FrictionCoefficientS * Surface.FrictionCoefficient *
+                        Mass * 9.8
+                        : Vector3.Zero;
                 Force += EnvironmentResistance + SideFriction;
             }
             else
             {
+                Vector3 BrakeFriction =
+                    Velocity.Magnitude > 0 ?
+                          -Velocity.Normalize() *
+                          FrictionCoefficientS * Surface.FrictionCoefficient *
+                          Mass * 9.8
+                          : Vector3.Zero;
                 Force += EnvironmentResistance + BrakeFriction;
             }
 
             Vector3 a = Force / Mass;
             Position.Location += Velocity * time + a * time2 / 2;
-            Velocity += a * time;            
+            Velocity += a * time;
         }
-
 
         protected virtual Vector3 ForceForward()
         {
@@ -179,5 +215,12 @@ namespace G.Base
         {
             Position.Direction = Position.Direction.RotateZ(-Power.Angular.ZCounterClockWise * time);
         }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            IsRun = false;
+            _cts.Cancel();
+        }        
     }
 }

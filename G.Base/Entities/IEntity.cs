@@ -9,5 +9,9 @@ namespace G.Base
         Position Position { get; }
         Vector3 Size { get; }
         double Mass { get; }
+
+        void Start();        
+        void Pause();
+        void Resume();
     }
 }

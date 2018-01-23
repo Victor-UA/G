@@ -13,7 +13,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
             <Button Name="b_Start" Width="90" Content="Start New" Click="b_Start_Click"/>
@@ -28,11 +27,7 @@
             <TextBlock Name="tb_PlayerY" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>
             <TextBlock Name="tb_PlayerVelocityAbs" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>
             <TextBlock Name="tb_PlayerAngle" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>
-        </StackPanel>
-        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="10" >
-            <TextBlock Name="tb_PlayerLocation" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>
-            <TextBlock Name="tb_PlayerVelocity" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>
-            <TextBlock Name="tb_PlayerDirection" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>            
+            <TextBlock Name="tb_PlayerMaxIterrationTime" Grid.Row="2" MinWidth="25" Margin="10,0,0,0" HorizontalAlignment="Left"/>
         </StackPanel>
     </Grid>
 </Window>

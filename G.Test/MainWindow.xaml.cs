@@ -20,6 +20,7 @@ namespace G.Test
         private bool isRun;
         private Player _player = null;
         private IDictionary<int, IEntityModel> _entitiesModels;
+        private object _lock = new object();
 
         public MainWindow()
         {
@@ -40,11 +41,10 @@ namespace G.Test
 
                 Random rnd = new Random();
                 _player = MainService.Instance.AddPlayer();
-                _player.Position.Location = new Vector3(10 + rnd.Next((int)mainWindow.ActualWidth/2 - 10), 10 + rnd.Next((int)mainWindow.ActualHeight/2 - 10), 0);
 
                 DrawGamePlay();                
 
-                //ConnectNewPlayers(1);
+                ConnectNewPlayers(1);
                 MoveAIPlayers();
             }
             else
@@ -62,15 +62,9 @@ namespace G.Test
         {
             Task.Factory.StartNew(() =>
             {
-                Random rnd = new Random();                
                 for (int i = 0; i < count; i++)
                 {
-                    Player player = MainService.Instance.AddPlayer();
-                    player.Position.Location = new Vector3(rnd.Next((int)mainWindow.ActualWidth), rnd.Next((int)mainWindow.ActualHeight), 0);
-                    player.Position.Direction = new Vector3((int)mainWindow.ActualWidth - rnd.Next((int)mainWindow.ActualWidth), rnd.Next((int)mainWindow.ActualHeight), 0);
-                    player.MoveState.Forward = true;
-                    player.MoveState.RotateLeft = rnd.NextDouble() > 0.5;
-                    player.MoveState.RotateRight = !player.MoveState.RotateLeft;
+                    MainService.Instance.AddPlayer();
                 }
             });
         }
@@ -83,6 +77,7 @@ namespace G.Test
                 {
                     int index = rnd.Next(_entitiesModels.Count);
                     int key = _entitiesModels.Keys.ElementAt(index);
+
                     if (_player.ID != key)
                     {
                         MainService.Instance.KillPlayer(key);
@@ -107,12 +102,12 @@ namespace G.Test
                             double tmp = rnd.NextDouble();
                             player.MoveState.RotateLeft = tmp > 0.6;
                             player.MoveState.RotateRight = tmp < 0.4;
-                            MainService.Instance.SetPlayerStates(player);
+                            MainService.Instance.SetPlayerStates(player.ID, player.MoveState);
                         }
                     }
                     Thread.Sleep(250);
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
         }
 
         private void StartService()
@@ -143,18 +138,13 @@ namespace G.Test
                             tb_PlayersCount.Text = MainService.Instance.GetEntities().Count.ToString() + " players";
                             tb_PlayerX.Text = _player.Position.Location.X.ToString("0");
                             tb_PlayerY.Text = _player.Position.Location.Y.ToString("0");
-
                             tb_PlayerVelocityAbs.Text = (_player.Velocity.Magnitude).ToString("0");
-                            tb_PlayerAngle.Text = _player.Position.Direction.Angle(_player.Velocity).ToString("0.00");
-
-                            tb_PlayerLocation.Text = _player.Position.Location.ToVerbString();
-                            tb_PlayerVelocity.Text = _player.Velocity.ToVerbString();
-                            tb_PlayerDirection.Text = _player.Position.Direction.ToVerbString();
+                            tb_PlayerMaxIterrationTime.Text = Entity.MaxIterrationTime.ToString();
                         }
                         catch (Exception) { }
                     });
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
 
             int SleepTime = 10;
             var IterationTime = new Stopwatch();
@@ -208,7 +198,7 @@ namespace G.Test
                     SleepTime = SleepTime < 10 ? 10 : SleepTime > 25 ? 25 : SleepTime;
                     Thread.Sleep(SleepTime);
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
         }
 
         private void Grid_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -231,7 +221,7 @@ namespace G.Test
                         break;                    
                 }
                 e.Handled = true;
-                MainService.Instance.SetPlayerStates(_player);
+                MainService.Instance.SetPlayerStates(_player.ID, _player.MoveState);
             }
         }
 
@@ -254,7 +244,7 @@ namespace G.Test
                         _player.MoveState.RotateRight = false;
                         break;
                 }
-                MainService.Instance.SetPlayerStates(_player);
+                MainService.Instance.SetPlayerStates(_player.ID, _player.MoveState);
             }
         }
 

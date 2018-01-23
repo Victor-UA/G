@@ -67,21 +67,7 @@ namespace G.Service
                 _args = args;
                 _commandIsManual = false;
                 _logic = new BaseLogic();
-            }
-            DateTime Now = DateTime.Now;
-            DateTime OldTime = Now;
-            Task.Factory.StartNew(() =>
-            {
-                while (IsRun)
-                {
-                    TimeSpan timeElapsed = Now - OldTime;
-                    Logic.DoMoves(timeElapsed);
-                    Logic.CheckStrikes();
-                    Thread.Sleep(1);
-                    OldTime = Now;
-                    Now = DateTime.Now;
-                }
-            });            
+            }                        
         }
 
 
@@ -131,9 +117,9 @@ namespace G.Service
         {
             Logic.KillPlayer(id);
         }
-        public void SetPlayerStates(Player player)
+        public void SetPlayerStates(int id, MoveStates moveState)
         {
-            Logic.SetPlayerStates(player);
+            Logic.SetPlayerStates(id, moveState);
         }
 
         public IDictionary<int, Entity> GetEntities()

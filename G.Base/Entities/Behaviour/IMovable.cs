@@ -17,7 +17,7 @@ namespace G.Base
         ISurface Surface { get; set; }
         double FrictionCoefficientS { get; }
         bool BreakesAreOnWithoutMoving { get; set; }
-
-        void DoMoves();
+        bool IsRun { get; }
+        bool IsPaused { get; }        
     }
 }

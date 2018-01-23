@@ -11,13 +11,18 @@ namespace G.Base
     {
         public Entity(double mass)
         {
-            ID = Counter++;
+            lock (Lock)
+            {
+                ID = Counter++;
+            }
             Position = new Position();
             Size = new Vector3();
             Mass = mass;
         }
 
         private static int Counter = 0;
+        public static object Lock { get; } = new object();
+        public static double MaxIterrationTime = 0;
 
         public int ID { get; }
         public Position Position { get; protected set; }
@@ -25,10 +30,12 @@ namespace G.Base
 
         protected double _mass;
         public virtual double Mass
-        { get
+        {
+            get
             {
                 return _mass;
-            } protected set
+            }
+            protected set
             {
                 if (value == 0)
                 {
@@ -37,10 +44,14 @@ namespace G.Base
                 _mass = value;
             }
         }        
+        
 
-        public virtual void Dispose()
-        {
-            Position = null;
-        }
+        public abstract void Start();
+
+        public abstract void Pause();
+
+        public abstract void Resume();
+
+        public virtual void Dispose() { }
     }
 }

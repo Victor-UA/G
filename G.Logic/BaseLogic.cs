@@ -3,6 +3,7 @@ using RP.Math;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Media3D;
 
@@ -17,44 +18,33 @@ namespace G.Logic
 
         private object _lock = new object();
         private IDictionary<int, Entity> _entities;
+        private Random _random = new Random();
 
         public Player AddPlayer()
         {
-            Player player = new Player(75);
+            MovableEntity player = new Player(75);
+            player.Position.Location = new Vector3(_random.Next(500), _random.Next(500), 0);
+            player.Position.Direction = new Vector3(_random.Next(500), _random.Next(500), 0);
             lock (_lock)
             {
                 _entities.Add(player.ID, player);            
             }
-            return player;
+            player.Start();
+            return player as Player;
         }
         public void KillPlayer(int id)
         {
             lock (_lock)
             {
-                if (_entities.ContainsKey(id))
+                try
                 {
-                    Entity player = _entities[id];
-                    if (player is Player)
-                    {
-                        _entities.Remove(id);
-                        player.Dispose();
-                    }
+                    _entities[id].Dispose();
+                    _entities.Remove(id);                    
                 }
+                catch (Exception) { }
             }
         }
-        public void DoMoves(TimeSpan timeElapsed)
-        {
-            lock (_lock)
-            {
-                foreach (var item in _entities.Values)
-                {
-                    if (item is IMovable)
-                    {
-                        (item as IMovable).DoMoves();                        
-                    }
-                }
-            }
-        }
+        
         public void CheckStrikes()
         {
             lock (_lock)
@@ -77,18 +67,18 @@ namespace G.Logic
             }
         }        
 
-        public void SetPlayerStates(Player player)
+        public void SetPlayerStates(int id, MoveStates moveState)
         {
             lock (_lock)
             {
-                if (_entities.ContainsKey(player.ID))
+                if (_entities.ContainsKey(id))
                 {
-                    Entity entity = _entities[player.ID];
+                    Entity entity = _entities[id];
                     if (entity is Player)
                     {
                         try
                         {
-                            (entity as Player).MoveState = player.MoveState;
+                            (entity as Player).MoveState = moveState;
                         }
                         catch (Exception){}
                     }

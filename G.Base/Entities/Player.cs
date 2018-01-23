@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using RP.Math;
 
@@ -23,6 +24,22 @@ namespace G.Base
             BreakesAreOnWithoutMoving = false;
 
             Size = new Vector3(10, 10, 10);
-        }                        
+        }
+
+        public override void Start()
+        {
+            IsRun = true;
+            DoMovesAsync(_cts.Token);
+        }
+
+        public override void Pause()
+        {
+            IsPaused = IsRun && true;
+        }
+
+        public override void Resume()
+        {
+            IsPaused = false;
+        }
     }
 }

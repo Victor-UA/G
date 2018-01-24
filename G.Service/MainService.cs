@@ -12,21 +12,28 @@ namespace G.Service
 {
     public sealed partial class MainService : ServiceBase
     {
-        private static readonly object s_lock = new object();
-        private static MainService _instance = null;
         public static MainService Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    Monitor.Enter(s_lock);
+                    Monitor.Enter(_lock);
                     MainService temp = new MainService();
                     Interlocked.Exchange(ref _instance, temp);
-                    Monitor.Exit(s_lock);
+                    Monitor.Exit(_lock);
                 }
                 return _instance;
             }
+        }
+        private static MainService _instance;
+
+        private static readonly object _lock;
+
+        static MainService()
+        {
+            _lock = new object();
+            _instance = null;
         }
 
 
@@ -40,10 +47,10 @@ namespace G.Service
             {
                 if (_logic == null)
                 {
-                    Monitor.Enter(s_lock);
+                    Monitor.Enter(_lock);
                     BaseLogic tmp = new BaseLogic();
                     Interlocked.Exchange(ref _logic, tmp);
-                    Monitor.Exit(s_lock);
+                    Monitor.Exit(_lock);
                 }
                 return _logic;
             }            

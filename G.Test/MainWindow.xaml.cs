@@ -70,20 +70,24 @@ namespace G.Test
         }
         private void KillPlayers(int count)
         {
-            Random rnd = new Random();
-            for (int i = 0; i < count; i++)
+            Task.Factory.StartNew(() =>
             {
                 if (_entitiesModels?.Count > 0)
                 {
-                    int index = rnd.Next(_entitiesModels.Count);
-                    int key = _entitiesModels.Keys.ElementAt(index);
-
-                    if (_player.ID != key)
+                    Random rnd = new Random();
+                    int[] keys = _entitiesModels.Keys.ToArray();
+                    for (int i = 0; i < count; i++)
                     {
-                        MainService.Instance.KillPlayer(key);
+                        int index = rnd.Next(keys.Length);
+                        int key = keys[index];
+
+                        if (_player.ID != key)
+                        {
+                            MainService.Instance.KillPlayer(key);
+                        }
                     }
                 }
-            }
+            });
         }
 
         private void MoveAIPlayers()
